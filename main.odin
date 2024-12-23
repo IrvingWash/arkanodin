@@ -76,6 +76,7 @@ main :: proc() {
             move_ball(&ball, dt)
         }
 
+        collide_ball_with_paddle(&ball, paddle)
         collide_ball_with_walls(&ball)
         move_paddle(&paddle, dt)
 
@@ -171,6 +172,27 @@ collide_ball_with_walls :: proc(ball: ^Ball) {
         ball.velocity.x *= -1
     }
     if ball.position.y < 0 || ball.position.y + BALL_HEIGHT > WINDOW_HEIGHT {
+        ball.velocity.y *= -1
+    }
+}
+
+collide_ball_with_paddle :: proc(ball: ^Ball, paddle: Paddle) {
+    are_colliding := rl.CheckCollisionRecs(
+        rl.Rectangle{
+            f32(ball.position.x),
+            f32(ball.position.y),
+            BALL_WIDTH,
+            BALL_HEIGHT
+        },
+        rl.Rectangle{
+            f32(paddle.position.x),
+            f32(paddle.position.y),
+            PADDLE_WIDTH,
+            PADDLE_HEIGHT,
+        }
+    )
+
+    if are_colliding {
         ball.velocity.y *= -1
     }
 }
