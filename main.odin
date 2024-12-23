@@ -66,9 +66,17 @@ main :: proc() {
     paddle := init_paddle()
 
     for !rl.WindowShouldClose() {
+
         dt := f64(rl.GetFrameTime() * 10)
 
         // Update
+        if !ball.has_started {
+            start_ball(&ball)
+        } else {
+            move_ball(&ball, dt)
+        }
+
+        collide_ball_with_walls(&ball)
         move_paddle(&paddle, dt)
 
         // Render
@@ -85,6 +93,22 @@ main :: proc() {
 
         rl.EndDrawing()
     }
+}
+
+should_start_ball :: proc() -> bool {
+    return rl.IsKeyPressed(rl.KeyboardKey.SPACE)
+}
+
+start_ball :: proc(ball: ^Ball) {
+    ball.has_started = should_start_ball()
+
+    ball.velocity.x = BALL_SPEED
+    ball.velocity.y = -BALL_SPEED
+}
+
+move_ball :: proc(ball: ^Ball, dt: f64) {
+    ball.position.x += ball.velocity.x * dt
+    ball.position.y += ball.velocity.y * dt
 }
 
 init_ball :: proc() -> Ball {
@@ -140,6 +164,15 @@ move_paddle :: proc(paddle: ^Paddle, dt: f64) {
     }
 
     add_vector2s_in_place(&paddle.position, paddle.velocity)
+}
+
+collide_ball_with_walls :: proc(ball: ^Ball) {
+    if ball.position.x < 0 || ball.position.x + BALL_WIDTH > WINDOW_WIDTH {
+        ball.velocity.x *= -1
+    }
+    if ball.position.y < 0 || ball.position.y + BALL_HEIGHT > WINDOW_HEIGHT {
+        ball.velocity.y *= -1
+    }
 }
 
 // ====================================================
