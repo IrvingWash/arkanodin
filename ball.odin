@@ -11,7 +11,7 @@ init_ball :: proc() -> Ball {
 	return Ball {
 		position = Vector2 {
 			x = WINDOW_WIDTH / 2 - BALL_WIDTH / 2,
-			y = WINDOW_HEIGHT - PADDLE_WIDTH,
+			y = WINDOW_HEIGHT - PADDLE_BOTTOM_OFFSET - PADDLE_HEIGHT,
 		},
 		velocity = Vector2{0, 0},
 	}
