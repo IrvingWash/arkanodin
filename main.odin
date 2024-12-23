@@ -4,9 +4,15 @@ import rl "vendor:raylib"
 
 GAME_TITLE :: "Arkanodin"
 
+// Utils
 Vector2 :: struct {
     x: f64,
     y: f64,
+}
+
+add_vector2s_in_place :: proc(lhs: ^Vector2, rhs: Vector2) {
+    lhs.x += rhs.x
+    lhs.y += rhs.y
 }
 
 // Window
@@ -65,6 +71,11 @@ main :: proc() {
     paddle := init_paddle()
 
     for !rl.WindowShouldClose() {
+        dt := f64(rl.GetFrameTime() * 10)
+
+        // Update
+        move_paddle(&paddle, dt)
+
         // Render
         rl.BeginDrawing()
         rl.ClearBackground(CLEAR_COLOR)
@@ -183,4 +194,18 @@ init_bricks :: proc() -> [BRICK_COUNT]Brick {
     }
 
     return result
+}
+
+move_paddle :: proc(paddle: ^Paddle, dt: f64) {
+    paddle.velocity.x = 0
+    paddle.velocity.y = 0
+
+    if rl.IsKeyDown(rl.KeyboardKey.A) {
+        paddle.velocity.x = -BALL_SPEED * dt
+    }
+    if rl.IsKeyDown(rl.KeyboardKey.D) {
+        paddle.velocity.x = BALL_SPEED * dt
+    }
+
+    add_vector2s_in_place(&paddle.position, paddle.velocity)
 }
