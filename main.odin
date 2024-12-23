@@ -4,26 +4,6 @@ import "core:fmt"
 import "core:strings"
 import rl "vendor:raylib"
 
-Brick :: struct {
-	position:  Vector2,
-	is_broken: bool,
-}
-
-Ball :: struct {
-	position: Vector2,
-	velocity: Vector2,
-}
-
-Paddle :: struct {
-	position:    Vector2,
-	velocity:    Vector2,
-	is_disabled: bool,
-}
-
-Score :: struct {
-	value: uint,
-}
-
 GameState :: enum {
 	Start,
 	Play,
@@ -31,9 +11,6 @@ GameState :: enum {
 	GameOver,
 }
 
-// ====================================================
-// Gameplay
-// ====================================================
 main :: proc() {
 	create_window()
 	defer close_window()
@@ -149,78 +126,6 @@ init_game_objects :: proc(
 	game_state^ = GameState.Start
 }
 
-launch_ball :: proc(ball: ^Ball) -> bool {
-	if rl.IsKeyPressed(rl.KeyboardKey.SPACE) {
-		ball.velocity.x = BALL_SPEED
-		ball.velocity.y = -BALL_SPEED
-
-		return true
-	}
-
-	return false
-}
-
-move_ball :: proc(ball: ^Ball, dt: f64) {
-	ball.position.x += ball.velocity.x * dt
-	ball.position.y += ball.velocity.y * dt
-}
-
-init_ball :: proc() -> Ball {
-	return Ball {
-		position = Vector2 {
-			x = WINDOW_WIDTH / 2 - BALL_WIDTH / 2,
-			y = WINDOW_HEIGHT - PADDLE_WIDTH,
-		},
-		velocity = Vector2{0, 0},
-	}
-}
-
-init_paddle :: proc() -> Paddle {
-	return Paddle {
-		position = Vector2 {
-			x = WINDOW_WIDTH / 2 - PADDLE_WIDTH / 2,
-			y = WINDOW_HEIGHT - PADDLE_BOTTOM_OFFSET,
-		},
-		velocity = Vector2{0, 0},
-	}
-}
-
-init_bricks :: proc() -> [BRICK_COUNT]Brick {
-	result: [BRICK_COUNT]Brick
-
-	next_index := 0
-	for i in 0 ..< BRICK_ROWS_COUNT {
-		for j in 0 ..< BRICK_COLUMNS_COUNT {
-			result[next_index] = Brick {
-				position = Vector2{x = f64(j * BRICK_WIDTH), y = f64(i * BRICK_HEIGHT)},
-				is_broken = false,
-			}
-
-			next_index += 1
-		}
-	}
-
-	return result
-}
-
-move_paddle :: proc(paddle: ^Paddle, ball: ^Ball, game_state: GameState, dt: f64) {
-	paddle.velocity.x = 0
-	paddle.velocity.y = 0
-
-	if rl.IsKeyDown(rl.KeyboardKey.A) {
-		paddle.velocity.x = -BALL_SPEED * dt
-	}
-	if rl.IsKeyDown(rl.KeyboardKey.D) {
-		paddle.velocity.x = BALL_SPEED * dt
-	}
-
-	add_vector2s_in_place(&paddle.position, paddle.velocity)
-
-	if game_state != GameState.Play {
-		ball.position.x += paddle.velocity.x
-	}
-}
-
 collide_paddle_with_walls :: proc(paddle: ^Paddle) {
 	if paddle.position.x <= 0 {
 		paddle.position.x = 0
@@ -279,22 +184,6 @@ collide_ball_with_bricks :: proc(ball: ^Ball, bricks: ^[BRICK_COUNT]Brick) {
 		if are_colliding {
 			brick.is_broken = true
 		}
-	}
-}
-
-update_score :: proc(score: ^Score, bricks: ^[BRICK_COUNT]Brick, game_state: ^GameState) {
-	broken_brick_count: uint
-
-	for &brick in bricks {
-		if brick.is_broken {
-			broken_brick_count += 1
-		}
-	}
-
-	score.value = broken_brick_count * POINTS_PER_BRICK
-
-	if score.value == MAX_SCORE {
-		game_state^ = GameState.Win
 	}
 }
 
@@ -370,29 +259,4 @@ draw_score :: proc(score: Score) {
 		SCORE_FONT_SIZE,
 		SCORE_COLOR,
 	)
-}
-
-// ====================================================
-// Utils
-// ====================================================
-create_window :: proc() {
-	rl.SetConfigFlags({.VSYNC_HINT})
-
-	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, GAME_TITLE)
-
-	rl.SetTargetFPS(TARGET_FPS)
-}
-
-close_window :: proc() {
-	rl.CloseWindow()
-}
-
-Vector2 :: struct {
-	x: f64,
-	y: f64,
-}
-
-add_vector2s_in_place :: proc(lhs: ^Vector2, rhs: Vector2) {
-	lhs.x += rhs.x
-	lhs.y += rhs.y
 }
