@@ -78,6 +78,7 @@ main :: proc() {
 
         collide_ball_with_paddle(&ball, paddle)
         collide_ball_with_walls(&ball)
+        collide_ball_with_bricks(&ball, &bricks)
         move_paddle(&paddle, &ball, dt)
 
         // Render
@@ -201,10 +202,43 @@ collide_ball_with_paddle :: proc(ball: ^Ball, paddle: Paddle) {
     }
 }
 
+collide_ball_with_bricks :: proc(ball: ^Ball, bricks: ^[BRICK_COUNT]Brick) {
+    ball_rectangle := rl.Rectangle{
+        f32(ball.position.x),
+        f32(ball.position.y),
+        BALL_WIDTH,
+        BALL_HEIGHT
+    }
+
+    for &brick in bricks {
+        if brick.is_broken {
+            continue
+        }
+
+        are_colliding := rl.CheckCollisionRecs(
+            ball_rectangle,
+            rl.Rectangle{
+                f32(brick.position.x),
+                f32(brick.position.y),
+                BRICK_WIDTH,
+                BRICK_HEIGHT
+            }
+        )
+
+        if are_colliding {
+            brick.is_broken = true
+        }
+    }
+}
+
 // ====================================================
 // Rendering
 // ====================================================
 draw_brick :: proc(brick: Brick) {
+    if brick.is_broken {
+        return
+    }
+
     rl.DrawRectangle(
         i32(brick.position.x),
         i32(brick.position.y),
