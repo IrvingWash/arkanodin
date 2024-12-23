@@ -18,9 +18,9 @@ main :: proc() {
 	asset_manager: AssetManager
 	defer am_destroy(&asset_manager)
 
-	am_load_sound(&asset_manager, "start", "assets/start.wav") // TODO: done
-	am_load_sound(&asset_manager, "break", "assets/break.wav") // TODO: done
-	am_load_sound(&asset_manager, "win", "assets/win.wav") // TODO: done
+	am_load_sound(&asset_manager, "start", "assets/start.wav")
+	am_load_sound(&asset_manager, "break", "assets/break.wav")
+	am_load_sound(&asset_manager, "win", "assets/win.wav")
 	am_load_sound(&asset_manager, "game_over", "assets/game_over.wav")
 
 	bricks: [BRICK_COUNT]Brick = ---
