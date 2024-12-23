@@ -1,7 +1,7 @@
 # Arkanodin
 
-Controls:
-SPACE - launch the ball
-A     - move the paddle to left
-D     - move the paddle to right
-R     - restart
+## Controls:<br>
+`SPACE` - launch the ball<br>
+`A`     - move the paddle to left<br>
+`D`     - move the paddle to right<br>
+`R`     - restart<br>
