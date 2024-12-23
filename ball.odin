@@ -17,10 +17,12 @@ init_ball :: proc() -> Ball {
 	}
 }
 
-launch_ball :: proc(ball: ^Ball) -> bool {
+launch_ball :: proc(ball: ^Ball, am: AssetManager) -> bool {
 	if rl.IsKeyPressed(rl.KeyboardKey.SPACE) {
 		ball.velocity.x = BALL_SPEED
 		ball.velocity.y = -BALL_SPEED
+
+		am_play_sound(am, "start")
 
 		return true
 	}

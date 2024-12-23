@@ -8,7 +8,7 @@ Score :: struct {
 	value: uint,
 }
 
-update_score :: proc(score: ^Score, bricks: ^[BRICK_COUNT]Brick, game_state: ^GameState) {
+update_score :: proc(score: ^Score, bricks: ^[BRICK_COUNT]Brick, game_state: ^GameState, am: AssetManager) {
 	broken_brick_count: uint
 
 	for &brick in bricks {
@@ -21,6 +21,8 @@ update_score :: proc(score: ^Score, bricks: ^[BRICK_COUNT]Brick, game_state: ^Ga
 
 	if score.value == MAX_SCORE {
 		game_state^ = GameState.Win
+
+		am_play_sound(am, "win")
 	}
 }
 

@@ -6,12 +6,14 @@ create_window :: proc() {
 	rl.SetConfigFlags({.VSYNC_HINT})
 
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, GAME_TITLE)
+	rl.InitAudioDevice()
 
 	rl.SetTargetFPS(TARGET_FPS)
 }
 
 close_window :: proc() {
 	rl.CloseWindow()
+	rl.CloseAudioDevice()
 }
 
 Vector2 :: struct {

@@ -16,7 +16,7 @@ collide_paddle_with_walls :: proc(paddle: ^Paddle) {
 	}
 }
 
-collide_ball_with_walls :: proc(ball: ^Ball, game_state: ^GameState) {
+collide_ball_with_walls :: proc(ball: ^Ball, game_state: ^GameState, am: AssetManager) {
 	if ball.position.x <= 0 || ball.position.x + BALL_WIDTH >= WINDOW_WIDTH {
 		ball.velocity.x *= -1
 	}
@@ -25,6 +25,8 @@ collide_ball_with_walls :: proc(ball: ^Ball, game_state: ^GameState) {
 	}
 	if ball.position.y + BALL_HEIGHT >= WINDOW_HEIGHT {
 		game_state^ = GameState.GameOver
+
+		am_play_sound(am, "game_over")
 	}
 }
 
@@ -39,7 +41,7 @@ collide_ball_with_paddle :: proc(ball: ^Ball, paddle: Paddle) {
 	}
 }
 
-collide_ball_with_bricks :: proc(ball: ^Ball, bricks: ^[BRICK_COUNT]Brick) {
+collide_ball_with_bricks :: proc(ball: ^Ball, bricks: ^[BRICK_COUNT]Brick, am: AssetManager) {
 	ball_rectangle := rl.Rectangle {
 		f32(ball.position.x),
 		f32(ball.position.y),
@@ -59,6 +61,8 @@ collide_ball_with_bricks :: proc(ball: ^Ball, bricks: ^[BRICK_COUNT]Brick) {
 
 		if are_colliding {
 			brick.is_broken = true
+
+			am_play_sound(am, "break")
 		}
 	}
 }
