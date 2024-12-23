@@ -78,7 +78,7 @@ main :: proc() {
 
         collide_ball_with_paddle(&ball, paddle)
         collide_ball_with_walls(&ball)
-        move_paddle(&paddle, dt)
+        move_paddle(&paddle, &ball, dt)
 
         // Render
         rl.BeginDrawing()
@@ -153,7 +153,7 @@ init_bricks :: proc() -> [BRICK_COUNT]Brick {
     return result
 }
 
-move_paddle :: proc(paddle: ^Paddle, dt: f64) {
+move_paddle :: proc(paddle: ^Paddle, ball: ^Ball, dt: f64) {
     paddle.velocity.x = 0
     paddle.velocity.y = 0
 
@@ -165,6 +165,10 @@ move_paddle :: proc(paddle: ^Paddle, dt: f64) {
     }
 
     add_vector2s_in_place(&paddle.position, paddle.velocity)
+
+    if !ball.has_started {
+        ball.position.x += paddle.velocity.x
+    }
 }
 
 collide_ball_with_walls :: proc(ball: ^Ball) {
@@ -254,8 +258,14 @@ draw_paddle :: proc(paddle: Paddle) {
     )
 }
 
+// ====================================================
+// Utils
+// ====================================================
 create_window :: proc() {
+    rl.SetConfigFlags({.VSYNC_HINT})
+
     rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, GAME_TITLE)
+
     rl.SetTargetFPS(TARGET_FPS)
 }
 
@@ -263,9 +273,6 @@ close_window :: proc() {
     rl.CloseWindow()
 }
 
-// ====================================================
-// Utils
-// ====================================================
 Vector2 :: struct {
     x: f64,
     y: f64,
