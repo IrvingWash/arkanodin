@@ -106,7 +106,7 @@ update :: proc(ball: ^Ball, paddle: ^Paddle, bricks: ^[BRICK_COUNT]Brick, score:
         collide_ball_with_paddle(ball, paddle^)
         collide_ball_with_walls(ball, game_state)
         collide_ball_with_bricks(ball, bricks)
-        update_score(score, bricks, game_state)
+        update_score(score, bricks)
     }
 
     if game_state^ != GameState.Win && game_state^ != GameState.GameOver {
@@ -132,7 +132,7 @@ render :: proc(bricks: [BRICK_COUNT]Brick, paddle: Paddle, ball: Ball, score: Sc
     if game_state == GameState.Win {
         rl.DrawText(
             "You won!",
-            WINDOW_WIDTH / 2 - 100,
+            WINDOW_WIDTH / 2,
             WINDOW_HEIGHT / 2,
             36,
             rl.GREEN
@@ -283,7 +283,7 @@ collide_ball_with_bricks :: proc(ball: ^Ball, bricks: ^[BRICK_COUNT]Brick) {
 	}
 }
 
-update_score :: proc(score: ^Score, bricks: ^[BRICK_COUNT]Brick, game_state: ^GameState) {
+update_score :: proc(score: ^Score, bricks: ^[BRICK_COUNT]Brick) {
 	broken_brick_count: uint
 
 	for &brick in bricks {
@@ -293,10 +293,6 @@ update_score :: proc(score: ^Score, bricks: ^[BRICK_COUNT]Brick, game_state: ^Ga
 	}
 
 	score.value = broken_brick_count * POINTS_PER_BRICK
-
-    if score.value == MAX_SCORE {
-        game_state^ = GameState.Win
-    }
 }
 
 // ====================================================
