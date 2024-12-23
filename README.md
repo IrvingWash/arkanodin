@@ -5,3 +5,4 @@
 `A`     - move the paddle to left<br>
 `D`     - move the paddle to right<br>
 `R`     - restart<br>
+`ESC`   - quit<br>

@@ -1,67 +1,24 @@
-package main
+package arkanodin
 
 import "core:fmt"
 import "core:strings"
 import rl "vendor:raylib"
-
-// ====================================================
-// Config
-// ====================================================
-GAME_TITLE :: "Arkanodin"
-
-// Window
-WINDOW_WIDTH :: 800
-WINDOW_HEIGHT :: 600
-TARGET_FPS :: 60
-CLEAR_COLOR :: rl.BLACK
-
-// Bricks
-BRICK_COLUMNS_COUNT :: 10
-BRICK_ROWS_COUNT :: 8
-BRICK_COUNT :: BRICK_COLUMNS_COUNT * BRICK_ROWS_COUNT
-BRICK_WIDTH :: WINDOW_WIDTH / BRICK_COLUMNS_COUNT
-BRICK_HEIGHT :: 20
-BRICK_COLOR :: rl.BLUE
-BRICK_OUTLINE :: rl.WHITE
 
 Brick :: struct {
 	position:  Vector2,
 	is_broken: bool,
 }
 
-// Ball
-BALL_WIDTH :: 20
-BALL_HEIGHT :: 20
-BALL_COLOR :: rl.WHITE
-BALL_OUTLINE :: rl.BLUE
-BALL_SPEED :: 50
-
 Ball :: struct {
 	position: Vector2,
 	velocity: Vector2,
 }
-
-// Paddle
-PADDLE_WIDTH :: 120
-PADDLE_HEIGHT :: 20
-PADDLE_COLOR :: rl.RED
-PADDLE_OUTLINE :: rl.WHITE
-PADDLE_SPEED :: 50
-PADDLE_BOTTOM_OFFSET :: 100
 
 Paddle :: struct {
 	position:    Vector2,
 	velocity:    Vector2,
 	is_disabled: bool,
 }
-
-// Score
-MAX_SCORE :: 10_000
-POINTS_PER_BRICK :: MAX_SCORE / BRICK_COUNT
-SCORE_BOTTOM_OFFSET :: WINDOW_HEIGHT - 50
-SCORE_LEFT_OFFSET :: 100
-SCORE_FONT_SIZE :: 16
-SCORE_COLOR :: rl.WHITE
 
 Score :: struct {
 	value: uint,
@@ -146,11 +103,23 @@ render :: proc(
 	draw_score(score)
 
 	if game_state == GameState.Win {
-		rl.DrawText("You won!", WINDOW_WIDTH / 2 - 100, WINDOW_HEIGHT / 2, 36, rl.GREEN)
+		rl.DrawText(
+			WIN_SCREEN_TEXT,
+			WIN_SCREEN_X_POSITION,
+			WIN_SCREEN_Y_POSITION,
+			WIN_SCREEN_FONT_SIZE,
+			WIN_WIN_SCREEN_FONT_COLOR,
+		)
 	}
 
 	if game_state == GameState.GameOver {
-		rl.DrawText("Game over", WINDOW_WIDTH / 2 - 100, WINDOW_HEIGHT / 2, 36, rl.RED)
+		rl.DrawText(
+			GAME_OVER_SCREEN_TEXT,
+			GAME_OVER_SCREEN_X_POSITION,
+			GAME_OVER_SCREEN_Y_POSITION,
+			GAME_OVER_SCREEN_FONT_SIZE,
+			GAME_OVER_SCREEN_FONT_COLOR,
+		)
 	}
 }
 
