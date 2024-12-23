@@ -17,7 +17,7 @@ CLEAR_COLOR :: rl.BLACK
 
 // Bricks
 BRICK_COLUMNS_COUNT :: 10
-BRICK_ROWS_COUNT :: 7
+BRICK_ROWS_COUNT :: 8
 BRICK_COUNT :: BRICK_COLUMNS_COUNT * BRICK_ROWS_COUNT
 BRICK_WIDTH :: WINDOW_WIDTH / BRICK_COLUMNS_COUNT
 BRICK_HEIGHT :: 20
@@ -57,14 +57,22 @@ Paddle :: struct {
 }
 
 // Score
-POINTS_PER_BRICK :: 10_000 / BRICK_COUNT
+MAX_SCORE :: 10_000
+POINTS_PER_BRICK :: MAX_SCORE / BRICK_COUNT
 SCORE_BOTTOM_OFFSET :: WINDOW_HEIGHT - 50
 SCORE_LEFT_OFFSET :: 100
-SCORE_FONT_SIZE :: 14
+SCORE_FONT_SIZE :: 16
 SCORE_COLOR :: rl.WHITE
 
 Score :: struct {
-    value: uint
+	value: uint,
+}
+
+GameState :: enum {
+	Start,
+	Play,
+	Win,
+	GameOver,
 }
 
 // ====================================================
@@ -77,7 +85,8 @@ main :: proc() {
 	bricks := init_bricks()
 	ball := init_ball()
 	paddle := init_paddle()
-    score: Score
+	score: Score
+	state := GameState.Start
 
 	for !rl.WindowShouldClose() {
 		dt := f64(rl.GetFrameTime() * 10)
@@ -87,13 +96,14 @@ main :: proc() {
 			start_ball(&ball)
 		} else {
 			move_ball(&ball, dt)
+			collide_ball_with_paddle(&ball, paddle)
+			collide_ball_with_walls(&ball)
+			collide_ball_with_bricks(&ball, &bricks)
+			update_score(&score, &bricks)
 		}
 
-		collide_ball_with_paddle(&ball, paddle)
-		collide_ball_with_walls(&ball)
-		collide_ball_with_bricks(&ball, &bricks)
+		collide_paddle_with_walls(&paddle)
 		move_paddle(&paddle, &ball, dt)
-        update_score(&score, &bricks)
 
 		// Render
 		rl.BeginDrawing()
@@ -105,7 +115,7 @@ main :: proc() {
 
 		draw_paddle(paddle)
 		draw_ball(ball)
-        draw_score(score)
+		draw_score(score)
 
 		rl.EndDrawing()
 	}
@@ -183,11 +193,25 @@ move_paddle :: proc(paddle: ^Paddle, ball: ^Ball, dt: f64) {
 	}
 }
 
+collide_paddle_with_walls :: proc(paddle: ^Paddle) {
+	if paddle.position.x <= 0 {
+		paddle.position.x = 0
+
+		return
+	}
+
+	if paddle.position.x + PADDLE_WIDTH >= WINDOW_WIDTH {
+		paddle.position.x = WINDOW_WIDTH - PADDLE_WIDTH
+
+		return
+	}
+}
+
 collide_ball_with_walls :: proc(ball: ^Ball) {
-	if ball.position.x < 0 || ball.position.x + BALL_WIDTH > WINDOW_WIDTH {
+	if ball.position.x <= 0 || ball.position.x + BALL_WIDTH >= WINDOW_WIDTH {
 		ball.velocity.x *= -1
 	}
-	if ball.position.y < 0 || ball.position.y + BALL_HEIGHT > WINDOW_HEIGHT {
+	if ball.position.y <= 0 || ball.position.y + BALL_HEIGHT >= WINDOW_HEIGHT {
 		ball.velocity.y *= -1
 	}
 }
@@ -228,15 +252,15 @@ collide_ball_with_bricks :: proc(ball: ^Ball, bricks: ^[BRICK_COUNT]Brick) {
 }
 
 update_score :: proc(score: ^Score, bricks: ^[BRICK_COUNT]Brick) {
-    broken_brick_count: uint
+	broken_brick_count: uint
 
-    for &brick in bricks {
-        if brick.is_broken {
-            broken_brick_count += 1
-        }
-    }
+	for &brick in bricks {
+		if brick.is_broken {
+			broken_brick_count += 1
+		}
+	}
 
-    score.value = broken_brick_count * POINTS_PER_BRICK
+	score.value = broken_brick_count * POINTS_PER_BRICK
 }
 
 // ====================================================
@@ -301,16 +325,16 @@ draw_paddle :: proc(paddle: Paddle) {
 }
 
 draw_score :: proc(score: Score) {
-    using fmt
-    using strings
+	using fmt
+	using strings
 
-    rl.DrawText(
-        clone_to_cstring(aprint("Score: ", score.value)),
-        SCORE_LEFT_OFFSET,
-        SCORE_BOTTOM_OFFSET,
-        SCORE_FONT_SIZE,
-        SCORE_COLOR
-    )
+	rl.DrawText(
+		clone_to_cstring(aprint("Score: ", score.value)),
+		SCORE_LEFT_OFFSET,
+		SCORE_BOTTOM_OFFSET,
+		SCORE_FONT_SIZE,
+		SCORE_COLOR,
+	)
 }
 
 // ====================================================
