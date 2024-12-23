@@ -2,11 +2,11 @@ package main
 
 import rl "vendor:raylib"
 
-GAME_TITLE :: "Arkanodin"
-
 // ====================================================
 // Config
 // ====================================================
+GAME_TITLE :: "Arkanodin"
+
 // Window
 WINDOW_WIDTH :: 800
 WINDOW_HEIGHT :: 600
