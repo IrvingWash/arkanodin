@@ -1,5 +1,9 @@
 package arkanodin
 
+import "core:fmt"
+import "core:strings"
+import rl "vendor:raylib"
+
 Score :: struct {
 	value: uint,
 }
@@ -18,4 +22,17 @@ update_score :: proc(score: ^Score, bricks: ^[BRICK_COUNT]Brick, game_state: ^Ga
 	if score.value == MAX_SCORE {
 		game_state^ = GameState.Win
 	}
+}
+
+draw_score :: proc(score: Score) {
+	using fmt
+	using strings
+
+	rl.DrawText(
+		clone_to_cstring(aprint("Score: ", score.value)),
+		SCORE_LEFT_OFFSET,
+		SCORE_BOTTOM_OFFSET,
+		SCORE_FONT_SIZE,
+		SCORE_COLOR,
+	)
 }

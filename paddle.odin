@@ -35,3 +35,21 @@ move_paddle :: proc(paddle: ^Paddle, ball: ^Ball, game_state: GameState, dt: f64
 		ball.position.x += paddle.velocity.x
 	}
 }
+
+draw_paddle :: proc(paddle: Paddle) {
+	rl.DrawRectangle(
+		i32(paddle.position.x),
+		i32(paddle.position.y),
+		PADDLE_WIDTH,
+		PADDLE_HEIGHT,
+		PADDLE_COLOR,
+	)
+
+	rl.DrawRectangleLines(
+		i32(paddle.position.x),
+		i32(paddle.position.y),
+		PADDLE_WIDTH,
+		PADDLE_HEIGHT,
+		PADDLE_OUTLINE,
+	)
+}

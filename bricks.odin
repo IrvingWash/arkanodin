@@ -1,5 +1,7 @@
 package arkanodin
 
+import rl "vendor:raylib"
+
 Brick :: struct {
 	position:  Vector2,
 	is_broken: bool,
@@ -21,4 +23,26 @@ init_bricks :: proc() -> [BRICK_COUNT]Brick {
 	}
 
 	return result
+}
+
+draw_brick :: proc(brick: Brick) {
+	if brick.is_broken {
+		return
+	}
+
+	rl.DrawRectangle(
+		i32(brick.position.x),
+		i32(brick.position.y),
+		BRICK_WIDTH,
+		BRICK_HEIGHT,
+		BRICK_COLOR,
+	)
+
+	rl.DrawRectangleLines(
+		i32(brick.position.x),
+		i32(brick.position.y),
+		BRICK_WIDTH,
+		BRICK_HEIGHT,
+		BRICK_OUTLINE,
+	)
 }

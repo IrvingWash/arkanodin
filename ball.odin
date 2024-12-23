@@ -7,6 +7,16 @@ Ball :: struct {
 	velocity: Vector2,
 }
 
+init_ball :: proc() -> Ball {
+	return Ball {
+		position = Vector2 {
+			x = WINDOW_WIDTH / 2 - BALL_WIDTH / 2,
+			y = WINDOW_HEIGHT - PADDLE_WIDTH,
+		},
+		velocity = Vector2{0, 0},
+	}
+}
+
 launch_ball :: proc(ball: ^Ball) -> bool {
 	if rl.IsKeyPressed(rl.KeyboardKey.SPACE) {
 		ball.velocity.x = BALL_SPEED
@@ -23,12 +33,20 @@ move_ball :: proc(ball: ^Ball, dt: f64) {
 	ball.position.y += ball.velocity.y * dt
 }
 
-init_ball :: proc() -> Ball {
-	return Ball {
-		position = Vector2 {
-			x = WINDOW_WIDTH / 2 - BALL_WIDTH / 2,
-			y = WINDOW_HEIGHT - PADDLE_WIDTH,
-		},
-		velocity = Vector2{0, 0},
-	}
+draw_ball :: proc(ball: Ball) {
+	rl.DrawRectangle(
+		i32(ball.position.x),
+		i32(ball.position.y),
+		BALL_WIDTH,
+		BALL_HEIGHT,
+		BALL_COLOR,
+	)
+
+	rl.DrawRectangleLines(
+		i32(ball.position.x),
+		i32(ball.position.y),
+		BALL_WIDTH,
+		BALL_HEIGHT,
+		BALL_OUTLINE,
+	)
 }
