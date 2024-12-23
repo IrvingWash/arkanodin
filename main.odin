@@ -86,24 +86,10 @@ main :: proc() {
 	ball := init_ball()
 	paddle := init_paddle()
 	score: Score
-	state := GameState.Start
+	game_state := GameState.Start
 
 	for !rl.WindowShouldClose() {
-		dt := f64(rl.GetFrameTime() * 10)
-
-		// Update
-		if !ball.has_started {
-			start_ball(&ball)
-		} else {
-			move_ball(&ball, dt)
-			collide_ball_with_paddle(&ball, paddle)
-			collide_ball_with_walls(&ball)
-			collide_ball_with_bricks(&ball, &bricks)
-			update_score(&score, &bricks)
-		}
-
-		collide_paddle_with_walls(&paddle)
-		move_paddle(&paddle, &ball, dt)
+        update(&ball, &paddle, &bricks, &score, &game_state)
 
 		// Render
 		rl.BeginDrawing()
@@ -119,6 +105,24 @@ main :: proc() {
 
 		rl.EndDrawing()
 	}
+}
+
+update :: proc(ball: ^Ball, paddle: ^Paddle, bricks: ^[BRICK_COUNT]Brick, score: ^Score, game_state: ^GameState) {
+    dt := f64(rl.GetFrameTime() * 10)
+
+    // Update
+    if !ball.has_started {
+        start_ball(ball)
+    } else {
+        move_ball(ball, dt)
+        collide_ball_with_paddle(ball, paddle^)
+        collide_ball_with_walls(ball)
+        collide_ball_with_bricks(ball, bricks)
+        update_score(score, bricks)
+    }
+
+    collide_paddle_with_walls(paddle)
+    move_paddle(paddle, ball, dt)
 }
 
 should_start_ball :: proc() -> bool {
