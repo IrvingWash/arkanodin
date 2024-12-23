@@ -8,11 +8,11 @@ AssetManager :: struct {
 }
 
 am_destroy :: proc(am: ^AssetManager) {
-    for _, sound in am.sounds {
-        rl.UnloadSound(sound)
-    }
+	for _, sound in am.sounds {
+		rl.UnloadSound(sound)
+	}
 
-    delete(am.sounds)
+	delete(am.sounds)
 }
 
 am_load_sound :: proc(am: ^AssetManager, name: string, path: string) {

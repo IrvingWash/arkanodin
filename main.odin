@@ -44,7 +44,7 @@ update :: proc(
 	bricks: ^[BRICK_COUNT]Brick,
 	score: ^Score,
 	game_state: ^GameState,
-	asset_manager: AssetManager
+	asset_manager: AssetManager,
 ) {
 	dt := f64(rl.GetFrameTime() * 10)
 
