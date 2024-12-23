@@ -42,12 +42,27 @@ Ball :: struct {
     has_started: bool,
 }
 
+// Paddle
+PADDLE_WIDTH :: 120
+PADDLE_HEIGHT :: 20
+PADDLE_COLOR :: rl.RED
+PADDLE_OUTLINE :: rl.WHITE
+PADDLE_SPEED :: 50
+PADDLE_BOTTOM_OFFSET :: 100
+
+Paddle :: struct {
+    position: Vector2,
+    velocity: Vector2,
+    is_disabled: bool,
+}
+
 main :: proc() {
     create_window()
     defer close_window()
 
     bricks := init_bricks()
     ball := init_ball()
+    paddle := init_paddle()
 
     for !rl.WindowShouldClose() {
         // Render
@@ -57,6 +72,8 @@ main :: proc() {
         for &brick in bricks {
             draw_brick(brick)
         }
+
+        draw_paddle(paddle)
 
         draw_ball(ball)
 
@@ -100,6 +117,24 @@ draw_ball :: proc(ball: Ball) {
     )
 }
 
+draw_paddle :: proc(paddle: Paddle) {
+    rl.DrawRectangle(
+        i32(paddle.position.x),
+        i32(paddle.position.y),
+        PADDLE_WIDTH,
+        PADDLE_HEIGHT,
+        PADDLE_COLOR,
+    )
+
+    rl.DrawRectangleLines(
+        i32(paddle.position.x),
+        i32(paddle.position.y),
+        PADDLE_WIDTH,
+        PADDLE_HEIGHT,
+        PADDLE_OUTLINE,
+    )
+}
+
 create_window :: proc() {
     rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, GAME_TITLE)
     rl.SetTargetFPS(TARGET_FPS)
@@ -114,6 +149,16 @@ init_ball :: proc() -> Ball {
         position = Vector2{
             x = WINDOW_WIDTH / 2 - BALL_WIDTH / 2,
             y = WINDOW_HEIGHT / 2 - BALL_HEIGHT / 2,
+        },
+        velocity = Vector2{0, 0},
+    }
+}
+
+init_paddle :: proc() -> Paddle {
+    return Paddle {
+        position = Vector2 {
+            x = WINDOW_WIDTH / 2 - PADDLE_WIDTH / 2,
+            y = WINDOW_HEIGHT - PADDLE_BOTTOM_OFFSET,
         },
         velocity = Vector2{0, 0},
     }
