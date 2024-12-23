@@ -4,17 +4,9 @@ import rl "vendor:raylib"
 
 GAME_TITLE :: "Arkanodin"
 
-// Utils
-Vector2 :: struct {
-    x: f64,
-    y: f64,
-}
-
-add_vector2s_in_place :: proc(lhs: ^Vector2, rhs: Vector2) {
-    lhs.x += rhs.x
-    lhs.y += rhs.y
-}
-
+// ====================================================
+// Config
+// ====================================================
 // Window
 WINDOW_WIDTH :: 800
 WINDOW_HEIGHT :: 600
@@ -62,6 +54,9 @@ Paddle :: struct {
     is_disabled: bool,
 }
 
+// ====================================================
+// Gameplay
+// ====================================================
 main :: proc() {
     create_window()
     defer close_window()
@@ -92,6 +87,64 @@ main :: proc() {
     }
 }
 
+init_ball :: proc() -> Ball {
+    return Ball {
+        position = Vector2{
+            x = WINDOW_WIDTH / 2 - BALL_WIDTH / 2,
+            y = WINDOW_HEIGHT - PADDLE_WIDTH,
+        },
+        velocity = Vector2{0, 0},
+    }
+}
+
+init_paddle :: proc() -> Paddle {
+    return Paddle {
+        position = Vector2 {
+            x = WINDOW_WIDTH / 2 - PADDLE_WIDTH / 2,
+            y = WINDOW_HEIGHT - PADDLE_BOTTOM_OFFSET,
+        },
+        velocity = Vector2{0, 0},
+    }
+}
+
+init_bricks :: proc() -> [BRICK_COUNT]Brick {
+    result: [BRICK_COUNT]Brick
+
+    next_index := 0
+    for i in 0..<BRICK_ROWS_COUNT {
+        for j in 0..<BRICK_COLUMNS_COUNT {
+            result[next_index] = Brick {
+                position = Vector2{
+                    x = f64(j * BRICK_WIDTH),
+                    y = f64(i * BRICK_HEIGHT),
+                },
+                is_broken = false,
+            }
+
+            next_index += 1
+        }
+    }
+
+    return result
+}
+
+move_paddle :: proc(paddle: ^Paddle, dt: f64) {
+    paddle.velocity.x = 0
+    paddle.velocity.y = 0
+
+    if rl.IsKeyDown(rl.KeyboardKey.A) {
+        paddle.velocity.x = -BALL_SPEED * dt
+    }
+    if rl.IsKeyDown(rl.KeyboardKey.D) {
+        paddle.velocity.x = BALL_SPEED * dt
+    }
+
+    add_vector2s_in_place(&paddle.position, paddle.velocity)
+}
+
+// ====================================================
+// Rendering
+// ====================================================
 draw_brick :: proc(brick: Brick) {
     rl.DrawRectangle(
         i32(brick.position.x),
@@ -155,57 +208,15 @@ close_window :: proc() {
     rl.CloseWindow()
 }
 
-init_ball :: proc() -> Ball {
-    return Ball {
-        position = Vector2{
-            x = WINDOW_WIDTH / 2 - BALL_WIDTH / 2,
-            y = WINDOW_HEIGHT - PADDLE_WIDTH,
-        },
-        velocity = Vector2{0, 0},
-    }
+// ====================================================
+// Utils
+// ====================================================
+Vector2 :: struct {
+    x: f64,
+    y: f64,
 }
 
-init_paddle :: proc() -> Paddle {
-    return Paddle {
-        position = Vector2 {
-            x = WINDOW_WIDTH / 2 - PADDLE_WIDTH / 2,
-            y = WINDOW_HEIGHT - PADDLE_BOTTOM_OFFSET,
-        },
-        velocity = Vector2{0, 0},
-    }
-}
-
-init_bricks :: proc() -> [BRICK_COUNT]Brick {
-    result: [BRICK_COUNT]Brick
-
-    next_index := 0
-    for i in 0..<BRICK_ROWS_COUNT {
-        for j in 0..<BRICK_COLUMNS_COUNT {
-            result[next_index] = Brick {
-                position = Vector2{
-                    x = f64(j * BRICK_WIDTH),
-                    y = f64(i * BRICK_HEIGHT),
-                },
-                is_broken = false,
-            }
-
-            next_index += 1
-        }
-    }
-
-    return result
-}
-
-move_paddle :: proc(paddle: ^Paddle, dt: f64) {
-    paddle.velocity.x = 0
-    paddle.velocity.y = 0
-
-    if rl.IsKeyDown(rl.KeyboardKey.A) {
-        paddle.velocity.x = -BALL_SPEED * dt
-    }
-    if rl.IsKeyDown(rl.KeyboardKey.D) {
-        paddle.velocity.x = BALL_SPEED * dt
-    }
-
-    add_vector2s_in_place(&paddle.position, paddle.velocity)
+add_vector2s_in_place :: proc(lhs: ^Vector2, rhs: Vector2) {
+    lhs.x += rhs.x
+    lhs.y += rhs.y
 }
