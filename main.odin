@@ -81,11 +81,13 @@ main :: proc() {
 	create_window()
 	defer close_window()
 
-	bricks := init_bricks()
-	ball := init_ball()
-	paddle := init_paddle()
-	score: Score
-	game_state := GameState.Start
+	bricks: [BRICK_COUNT]Brick = ---
+	ball: Ball = ---
+	paddle: Paddle = ---
+	score: Score = ---
+	game_state: GameState = ---
+
+	init_game_objects(&game_state, &ball, &paddle, &bricks, &score)
 
 	for !rl.WindowShouldClose() {
 		update(&ball, &paddle, &bricks, &score, &game_state)
@@ -102,6 +104,8 @@ update :: proc(
 	game_state: ^GameState,
 ) {
 	dt := f64(rl.GetFrameTime() * 10)
+
+	restart(game_state, ball, paddle, bricks, score)
 
 	if game_state^ == GameState.Start {
 		if launch_ball(ball) {
@@ -148,6 +152,32 @@ render :: proc(
 	if game_state == GameState.GameOver {
 		rl.DrawText("Game over", WINDOW_WIDTH / 2 - 100, WINDOW_HEIGHT / 2, 36, rl.RED)
 	}
+}
+
+restart :: proc(
+	game_state: ^GameState,
+	ball: ^Ball,
+	paddle: ^Paddle,
+	bricks: ^[BRICK_COUNT]Brick,
+	score: ^Score,
+) {
+	if rl.IsKeyPressed(rl.KeyboardKey.R) {
+		init_game_objects(game_state, ball, paddle, bricks, score)
+	}
+}
+
+init_game_objects :: proc(
+	game_state: ^GameState,
+	ball: ^Ball,
+	paddle: ^Paddle,
+	bricks: ^[BRICK_COUNT]Brick,
+	score: ^Score,
+) {
+	bricks^ = init_bricks()
+	ball^ = init_ball()
+	paddle^ = init_paddle()
+	score^ = Score{}
+	game_state^ = GameState.Start
 }
 
 launch_ball :: proc(ball: ^Ball) -> bool {
