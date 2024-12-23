@@ -37,8 +37,8 @@ BALL_OUTLINE :: rl.BLUE
 BALL_SPEED :: 50
 
 Ball :: struct {
-	position:    Vector2,
-	velocity:    Vector2,
+	position: Vector2,
+	velocity: Vector2,
 }
 
 // Paddle
@@ -88,77 +88,77 @@ main :: proc() {
 	game_state := GameState.Start
 
 	for !rl.WindowShouldClose() {
-        update(&ball, &paddle, &bricks, &score, &game_state)
+		update(&ball, &paddle, &bricks, &score, &game_state)
 
-        render(bricks, paddle, ball, score, game_state)
+		render(bricks, paddle, ball, score, game_state)
 	}
 }
 
-update :: proc(ball: ^Ball, paddle: ^Paddle, bricks: ^[BRICK_COUNT]Brick, score: ^Score, game_state: ^GameState) {
-    dt := f64(rl.GetFrameTime() * 10)
+update :: proc(
+	ball: ^Ball,
+	paddle: ^Paddle,
+	bricks: ^[BRICK_COUNT]Brick,
+	score: ^Score,
+	game_state: ^GameState,
+) {
+	dt := f64(rl.GetFrameTime() * 10)
 
-    if game_state^ == GameState.Start {
-        if launch_ball(ball) {
-            game_state^ = GameState.Play
-        }
-    } else if game_state^ == GameState.Play {
-        move_ball(ball, dt)
-        collide_ball_with_paddle(ball, paddle^)
-        collide_ball_with_walls(ball, game_state)
-        collide_ball_with_bricks(ball, bricks)
-        update_score(score, bricks, game_state)
-    }
+	if game_state^ == GameState.Start {
+		if launch_ball(ball) {
+			game_state^ = GameState.Play
+		}
+	} else if game_state^ == GameState.Play {
+		move_ball(ball, dt)
+		collide_ball_with_paddle(ball, paddle^)
+		collide_ball_with_walls(ball, game_state)
+		collide_ball_with_bricks(ball, bricks)
+		update_score(score, bricks, game_state)
+	}
 
-    if game_state^ != GameState.Win && game_state^ != GameState.GameOver {
-        collide_paddle_with_walls(paddle)
-        move_paddle(paddle, ball, game_state^, dt)
-    }
+	if game_state^ != GameState.Win && game_state^ != GameState.GameOver {
+		collide_paddle_with_walls(paddle)
+		move_paddle(paddle, ball, game_state^, dt)
+	}
 }
 
-render :: proc(bricks: [BRICK_COUNT]Brick, paddle: Paddle, ball: Ball, score: Score, game_state: GameState) {
-    rl.BeginDrawing()
-    defer rl.EndDrawing()
+render :: proc(
+	bricks: [BRICK_COUNT]Brick,
+	paddle: Paddle,
+	ball: Ball,
+	score: Score,
+	game_state: GameState,
+) {
+	rl.BeginDrawing()
+	defer rl.EndDrawing()
 
-    rl.ClearBackground(CLEAR_COLOR)
+	rl.ClearBackground(CLEAR_COLOR)
 
-    for brick in bricks {
-        draw_brick(brick)
-    }
+	for brick in bricks {
+		draw_brick(brick)
+	}
 
-    draw_paddle(paddle)
-    draw_ball(ball)
-    draw_score(score)
+	draw_paddle(paddle)
+	draw_ball(ball)
+	draw_score(score)
 
-    if game_state == GameState.Win {
-        rl.DrawText(
-            "You won!",
-            WINDOW_WIDTH / 2 - 100,
-            WINDOW_HEIGHT / 2,
-            36,
-            rl.GREEN
-        )
-    }
+	if game_state == GameState.Win {
+		rl.DrawText("You won!", WINDOW_WIDTH / 2 - 100, WINDOW_HEIGHT / 2, 36, rl.GREEN)
+	}
 
-    if game_state == GameState.GameOver {
-        rl.DrawText(
-            "Game over",
-            WINDOW_WIDTH / 2 - 100,
-            WINDOW_HEIGHT / 2,
-            36,
-            rl.RED
-        )
-    }
+	if game_state == GameState.GameOver {
+		rl.DrawText("Game over", WINDOW_WIDTH / 2 - 100, WINDOW_HEIGHT / 2, 36, rl.RED)
+	}
 }
 
 launch_ball :: proc(ball: ^Ball) -> bool {
 	if rl.IsKeyPressed(rl.KeyboardKey.SPACE) {
-        ball.velocity.x = BALL_SPEED
-        ball.velocity.y = -BALL_SPEED
+		ball.velocity.x = BALL_SPEED
+		ball.velocity.y = -BALL_SPEED
 
-        return true
-    }
+		return true
+	}
 
-    return false
+	return false
 }
 
 move_ball :: proc(ball: ^Ball, dt: f64) {
@@ -243,9 +243,9 @@ collide_ball_with_walls :: proc(ball: ^Ball, game_state: ^GameState) {
 	if ball.position.y <= 0 {
 		ball.velocity.y *= -1
 	}
-    if ball.position.y + BALL_HEIGHT >= WINDOW_HEIGHT {
-        game_state^ = GameState.GameOver
-    }
+	if ball.position.y + BALL_HEIGHT >= WINDOW_HEIGHT {
+		game_state^ = GameState.GameOver
+	}
 }
 
 collide_ball_with_paddle :: proc(ball: ^Ball, paddle: Paddle) {
@@ -294,9 +294,9 @@ update_score :: proc(score: ^Score, bricks: ^[BRICK_COUNT]Brick, game_state: ^Ga
 
 	score.value = broken_brick_count * POINTS_PER_BRICK
 
-    if score.value == MAX_SCORE {
-        game_state^ = GameState.Win
-    }
+	if score.value == MAX_SCORE {
+		game_state^ = GameState.Win
+	}
 }
 
 // ====================================================
