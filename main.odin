@@ -1,5 +1,7 @@
 package main
 
+import "core:fmt"
+import "core:strings"
 import rl "vendor:raylib"
 
 // ====================================================
@@ -54,6 +56,17 @@ Paddle :: struct {
 	is_disabled: bool,
 }
 
+// Score
+POINTS_PER_BRICK :: 10_000 / BRICK_COUNT
+SCORE_BOTTOM_OFFSET :: WINDOW_HEIGHT - 50
+SCORE_LEFT_OFFSET :: 100
+SCORE_FONT_SIZE :: 14
+SCORE_COLOR :: rl.WHITE
+
+Score :: struct {
+    value: uint
+}
+
 // ====================================================
 // Gameplay
 // ====================================================
@@ -64,6 +77,7 @@ main :: proc() {
 	bricks := init_bricks()
 	ball := init_ball()
 	paddle := init_paddle()
+    score: Score
 
 	for !rl.WindowShouldClose() {
 		dt := f64(rl.GetFrameTime() * 10)
@@ -79,6 +93,7 @@ main :: proc() {
 		collide_ball_with_walls(&ball)
 		collide_ball_with_bricks(&ball, &bricks)
 		move_paddle(&paddle, &ball, dt)
+        update_score(&score, &bricks)
 
 		// Render
 		rl.BeginDrawing()
@@ -89,8 +104,8 @@ main :: proc() {
 		}
 
 		draw_paddle(paddle)
-
 		draw_ball(ball)
+        draw_score(score)
 
 		rl.EndDrawing()
 	}
@@ -212,6 +227,18 @@ collide_ball_with_bricks :: proc(ball: ^Ball, bricks: ^[BRICK_COUNT]Brick) {
 	}
 }
 
+update_score :: proc(score: ^Score, bricks: ^[BRICK_COUNT]Brick) {
+    broken_brick_count: uint
+
+    for &brick in bricks {
+        if brick.is_broken {
+            broken_brick_count += 1
+        }
+    }
+
+    score.value = broken_brick_count * POINTS_PER_BRICK
+}
+
 // ====================================================
 // Rendering
 // ====================================================
@@ -271,6 +298,19 @@ draw_paddle :: proc(paddle: Paddle) {
 		PADDLE_HEIGHT,
 		PADDLE_OUTLINE,
 	)
+}
+
+draw_score :: proc(score: Score) {
+    using fmt
+    using strings
+
+    rl.DrawText(
+        clone_to_cstring(aprint("Score: ", score.value)),
+        SCORE_LEFT_OFFSET,
+        SCORE_BOTTOM_OFFSET,
+        SCORE_FONT_SIZE,
+        SCORE_COLOR
+    )
 }
 
 // ====================================================
